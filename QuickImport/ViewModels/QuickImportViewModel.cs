@@ -4,11 +4,10 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using QuickImport.Models;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
 using System.Windows;
 
-namespace QuickImport.ModelViews;
+namespace QuickImport.ViewModels;
 
 public partial class QuickImportViewModel : ObservableObject
 {
@@ -23,35 +22,36 @@ public partial class QuickImportViewModel : ObservableObject
     [RelayCommand]
     private void ImportFile()
     {
-        OpenFileDialog dlg = new OpenFileDialog
+        OpenFileDialog dialog = new OpenFileDialog
         {
             Filter = "Excel файлы|*.xls;*.xlsx|CSV файлы|*.csv",
             Title = "Выберите файл"
         };
 
-        if (dlg.ShowDialog() == true)
+        if (dialog.ShowDialog() == true)
         {
-            string filename = dlg.FileName;
+            string filename = dialog.FileName;
             try
             {
                 if (Path.GetExtension(filename).ToLower() == ".csv")
                 {
                     // Простейший импорт CSV (разделитель – запятая)
-                    var lines = File.ReadAllLines(filename);
+                    var lines = File.ReadAllLines(filename).Skip(1);
                     foreach (var line in lines)
                     {
                         // Ожидается 6 столбцов: Name, Distance, Angle, Width, Height, IsDefect
-                        var parts = line.Split(',');
+                        var parts = line.Split(';');
                         if (parts.Length < 6) continue;
 
-                        if (double.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double distance) &&
-                            double.TryParse(parts[2], NumberStyles.Any, CultureInfo.InvariantCulture, out double angle) &&
-                            double.TryParse(parts[3], NumberStyles.Any, CultureInfo.InvariantCulture, out double width) &&
-                            double.TryParse(parts[4], NumberStyles.Any, CultureInfo.InvariantCulture, out double height) &&
-                            bool.TryParse(parts[5], out bool isDefect))
-                        {
-                            Objects.Add(new ObjectData(parts[0], distance, angle, width, height, isDefect));
-                        }
+                        Objects.Add(new ObjectData
+                        (
+                           Name: parts[0], 
+                           Distance: double.Parse(parts[1]),
+                           Angle: double.Parse(parts[2]),
+                           Width: double.Parse(parts[3]),
+                           Height: double.Parse(parts[4]),
+                           IsDefect: parts[5].ToLower() == "yes"
+                        ));
                     }
                 }
                 else
@@ -61,8 +61,8 @@ public partial class QuickImportViewModel : ObservableObject
                 }
             }
             catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при импорте файла: {ex.Message}");
+            {                
+                MessageBox.Show($"Ошибка при чтении файла\n: {ex.Message}");
             }
         }
     }
