@@ -1,9 +1,41 @@
-﻿namespace QuickImport.Models;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-public record ObjectData(
-       string Name,
-       double Distance, // Горизонтальная координата в метрах (0–20)
-       double Angle,    // Вертикальная координата в часах (0–12)
-       double Width,    // Горизонтальный размер (м)
-       double Height,   // Вертикальный размер (ч)
-       bool IsDefect);  // Является ли объект дефектом
+namespace QuickImport.Models;
+
+public partial class ObjectData : ObservableObject
+{
+    [ObservableProperty]
+    private string name;
+
+    [ObservableProperty]
+    private double distance; // Горизонтальная координата в м (0–20)
+
+    [ObservableProperty]
+    private double angle;    // Вертикальная координата в часах (0–12)
+
+    [ObservableProperty]
+    private double width;    // Горизонтальный размер (м)
+
+    [ObservableProperty]
+    private double height;   // Вертикальный размер (ч)
+
+    [ObservableProperty]
+    private bool isDefect;   // Является ли объект дефектом
+
+
+    public ObjectData(
+        string name, 
+        double distance, 
+        double angle, 
+        double width, 
+        double height, 
+        bool isDefect)
+    {
+        this.name = name;
+        this.distance = distance;
+        this.angle = angle;
+        this.width = width;
+        this.height = height;
+        this.isDefect = isDefect;
+    }
+}

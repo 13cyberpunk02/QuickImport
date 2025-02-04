@@ -2,7 +2,11 @@
     x:Class="QuickImport.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:QuickImport.Converters"
     xmlns:local="clr-namespace:QuickImport.Views"
     StartupUri="/Views/QuickImportView.xaml">
-    <Application.Resources />
+    <Application.Resources>
+        <converters:ScaleConverter x:Key="ScaleConverter" />
+        <converters:PositionConverter x:Key="PositionConverter" />
+    </Application.Resources>
 </Application>

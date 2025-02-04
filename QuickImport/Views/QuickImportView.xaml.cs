@@ -1,15 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
+﻿using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace QuickImport.Views
@@ -22,6 +12,38 @@ namespace QuickImport.Views
         public QuickImportView()
         {
             InitializeComponent();
+            DrawGridLines(MyCanvas.Width, MyCanvas.Height, 20); // Шаг сетки 20 пикселей
+        }
+
+        private void DrawGridLines(double canvasWidth, double canvasHeight, double gridSpacing)
+        {
+            for (double x = 0; x <= canvasWidth; x += gridSpacing)
+            {
+                Line verticalLine = new Line
+                {
+                    X1 = x,
+                    Y1 = 0,
+                    X2 = x,
+                    Y2 = canvasHeight,
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 0.5
+                };
+                GridLinesCanvas.Children.Add(verticalLine);
+            }
+
+            for (double y = 0; y <= canvasHeight; y += gridSpacing)
+            {
+                Line horizontalLine = new Line
+                {
+                    X1 = 0,
+                    Y1 = y,
+                    X2 = canvasWidth,
+                    Y2 = y,
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 0.5
+                };
+                GridLinesCanvas.Children.Add(horizontalLine);
+            }
         }
     }
 }

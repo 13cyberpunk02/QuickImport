@@ -6,23 +6,25 @@ using Microsoft.Win32;
 using QuickImport.Models;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows;
-using System.Windows.Media.Media3D;
-using System.Xml.Linq;
 
 namespace QuickImport.ViewModels;
 
 public partial class QuickImportViewModel : ObservableObject
 {
     // Коллекция объектов для DataGrid
-    public ObservableCollection<ObjectData> Objects { get; } = new ObservableCollection<ObjectData>();
+    public ObservableCollection<ObjectData> Objects { get; } 
 
     // Выбранный объект (для отображения деталей)
     [ObservableProperty]
     private ObjectData? selectedObject;
+
+    public QuickImportViewModel()
+    {
+        Objects = new ObservableCollection<ObjectData>();
+    }
 
     // Команда импорта файла
     [RelayCommand]
@@ -63,12 +65,12 @@ public partial class QuickImportViewModel : ObservableObject
 
                 Objects.Add(new ObjectData
                 (
-                   Name: parts[0],
-                   Distance: double.Parse(parts[1]),
-                   Angle: double.Parse(parts[2]),
-                   Width: double.Parse(parts[3]),
-                   Height: double.Parse(parts[4]),
-                   IsDefect: parts[5].ToLower() == "yes"
+                   name: parts[0],
+                   distance: double.Parse(parts[1]),
+                   angle: double.Parse(parts[2]),
+                   width: double.Parse(parts[3]),
+                   height: double.Parse(parts[4]),
+                   isDefect: parts[5].ToLower() == "yes"
                 ));
             }
         }
@@ -105,12 +107,12 @@ public partial class QuickImportViewModel : ObservableObject
                 var isDefected = dt.Rows[row][5].ToString().ToLower() == "yes";
                 Objects.Add(new ObjectData
                 (
-                    Name: dt.Rows[row][0].ToString(),
-                    Distance: double.Parse(dt.Rows[row][1].ToString()),
-                    Angle: double.Parse(dt.Rows[row][2].ToString()),
-                    Width: double.Parse(dt.Rows[row][3].ToString()),
-                    Height: double.Parse(dt.Rows[row][4].ToString()),
-                    IsDefect: isDefected
+                    name: dt.Rows[row][0].ToString(),
+                    distance: double.Parse(dt.Rows[row][1].ToString()),
+                    angle: double.Parse(dt.Rows[row][2].ToString()),
+                    width: double.Parse(dt.Rows[row][3].ToString()),
+                    height: double.Parse(dt.Rows[row][4].ToString()),
+                    isDefect: isDefected
                 ));
             }
             catch (Exception exRow)

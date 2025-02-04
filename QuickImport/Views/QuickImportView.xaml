@@ -10,13 +10,8 @@
     Title="Импорт и отображение объектов"
     Width="1000"
     Height="800"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-
-    <!--  Ресурсы окна: конвертеры  -->
-    <Window.Resources>
-        <converters:MeterToPixelConverter x:Key="MeterToPixelConverter" />
-        <converters:HourToPixelConverter x:Key="HourToPixelConverter" />
-    </Window.Resources>
 
     <!--  Установка DataContext через ресурс  -->
 
@@ -32,15 +27,13 @@
         </Grid.RowDefinitions>
 
         <!--  Верхняя панель с кнопкой импорта  -->
-        <StackPanel
+        <Button
             Grid.Row="0"
-            Margin="5,5,0,5"
-            Orientation="Horizontal">
-            <Button
-                Padding="5"
-                Command="{Binding ImportFileCommand}"
-                Content="Импортировать файл" />
-        </StackPanel>
+            Margin="15,5,0,5"
+            Padding="5"
+            HorizontalAlignment="Left"
+            Command="{Binding ImportFileCommand}"
+            Content="Импортировать файл" />
 
         <!--  Основной контент  -->
         <Grid Grid.Row="1">
@@ -57,8 +50,7 @@
             <DataGrid
                 Grid.Row="0"
                 Grid.Column="0"
-                Height="300"
-                Margin="15,0,5,5"
+                Margin="15,0,5,10"
                 Padding="5"
                 AutoGenerateColumns="False"
                 CanUserAddRows="True"
@@ -83,47 +75,71 @@
                 <TextBlock
                     Margin="10,0,0,5"
                     FontWeight="Bold"
-                    Text="Детали выбранного объекта:" />
-                <TextBlock Text="{Binding Name}" />
-                <TextBlock Text="{Binding Distance, StringFormat='Гор. координата: {0}'}" />
-                <TextBlock Text="{Binding Angle, StringFormat='Вер. координата: {0}'}" />
-                <TextBlock Text="{Binding Width, StringFormat='Гор. размер: {0}'}" />
-                <TextBlock Text="{Binding Height, StringFormat='Вер. размер: {0}'}" />
-                <TextBlock Text="{Binding IsDefect, StringFormat='Дефект: {0} '}" />
+                    Text="Детали выбранного объекта:"
+                    TextAlignment="Center" />
+                <TextBlock Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Text="{Binding Distance, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, StringFormat='Гор. координата: {0}'}" />
+                <TextBlock Text="{Binding Angle, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, StringFormat='Вер. координата: {0}'}" />
+                <TextBlock Text="{Binding Width, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, StringFormat='Гор. размер: {0}'}" />
+                <TextBlock Text="{Binding Height, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, StringFormat='Вер. размер: {0}'}" />
+                <TextBlock Text="{Binding IsDefect, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, StringFormat='Дефект: {0}'}" />
             </StackPanel>
 
-            <!--  Графическое отображение (Canvas)  -->
             <ScrollViewer
                 Grid.Row="1"
                 Grid.RowSpan="2"
                 Grid.Column="0"
-                Margin="10,0,0,10">
+                CanContentScroll="True">
+
+                <!--  Графическое отображение (Canvas)  -->
                 <!--  Canvas размером 400x240 пикселей (20 м x 12 ч)  -->
-                <Canvas Background="LightGray">
-                    <!--  Используем ItemsControl для отрисовки прямоугольников  -->
+                <Canvas
+                    x:Name="MyCanvas"
+                    Width="400"
+                    Height="240"
+                    Background="LightGray">
+                    <!--  Здесь будут линии сетки  -->
+                    <Canvas x:Name="GridLinesCanvas" />
+                    <!--  Здесь будут отображаться ваши объекты  -->
                     <ItemsControl ItemsSource="{Binding Objects}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <Canvas />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemContainerStyle>
+                            <Style>
+                                <Setter Property="Canvas.Left">
+                                    <Setter.Value>
+                                        <MultiBinding Converter="{StaticResource PositionConverter}" ConverterParameter="X">
+                                            <Binding Path="Distance" />
+                                            <Binding Path="Width" />
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Canvas.Top">
+                                    <Setter.Value>
+                                        <MultiBinding Converter="{StaticResource PositionConverter}" ConverterParameter="Y">
+                                            <Binding Path="Angle" />
+                                            <Binding Path="Height" />
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <!--  Прямоугольник с рамкой; координаты и размеры преобразуются в пиксели  -->
-                                <Border
-                                    Canvas.Left="{Binding Distance, Converter={StaticResource MeterToPixelConverter}}"
-                                    Canvas.Top="{Binding Angle, Converter={StaticResource HourToPixelConverter}}"
-                                    Width="{Binding Width, Converter={StaticResource MeterToPixelConverter}}"
-                                    Height="{Binding Height, Converter={StaticResource HourToPixelConverter}}"
-                                    Background="Transparent"
-                                    BorderBrush="Red"
-                                    BorderThickness="2" />
+                                <Rectangle
+                                    Width="{Binding Width, Converter={StaticResource ScaleConverter}, ConverterParameter=20}"
+                                    Height="{Binding Height, Converter={StaticResource ScaleConverter}, ConverterParameter=20}"
+                                    Fill="Transparent"
+                                    Stroke="Red"
+                                    StrokeThickness="2" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </Canvas>
             </ScrollViewer>
-
         </Grid>
     </Grid>
 </Window>
